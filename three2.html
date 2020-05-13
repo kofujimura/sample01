@@ -104,14 +104,14 @@ a {
  
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.x = 0;
-    mesh.position.y = 150;
+    mesh.position.y = 0;
     mesh.position.z = 0;
     mesh.castShadow = true;
     mesh.rotation.y = -Math.PI/2;
     scene.add(mesh);
  
     // 立体（下）
-    geometry = new THREE.BoxGeometry(100, 100, 100);
+    geometry = new THREE.BoxGeometry(20, 20, 20);
     material = new THREE.MeshLambertMaterial({
       color: 0xdd11ee,
       //specular: 0xcccccc,
@@ -119,13 +119,21 @@ a {
       //map: texture
     });
 
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.x = 0;
-    mesh.position.y = 50;
-    mesh.position.z = 0;
-    mesh.receiveShadow = true;
-    mesh.castShadow = true;
-    scene.add(mesh);
+
+    for (let i=0;i<2000;i++){
+      mesh = new THREE.Mesh(geometry, material);
+      let x = Math.random()*1000-500;
+      mesh.position.x = x;
+      let y = Math.random()*1000-500;
+      mesh.position.y = y;
+      let z = Math.random()*1000-500;
+      mesh.position.z = z;
+      mesh.receiveShadow = true;
+      mesh.castShadow = true;
+      if (Math.sqrt(x*x + y*y + z*z)< 500) {
+        scene.add(mesh);
+      }
+    }
  
     //地面（PlaneGeometry）の生成
     var mesh =  new THREE.Mesh(

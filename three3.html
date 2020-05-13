@@ -52,6 +52,7 @@ a {
   var container;
   var camera, controls, light, scene, renderer;
   var mesh;
+  var mesh1;
  
   var texture;
   var loader = new THREE.TextureLoader();
@@ -102,13 +103,13 @@ a {
       map: texture
     });
  
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.x = 0;
-    mesh.position.y = 150;
-    mesh.position.z = 0;
-    mesh.castShadow = true;
-    mesh.rotation.y = -Math.PI/2;
-    scene.add(mesh);
+    mesh1 = new THREE.Mesh(geometry, material);
+    mesh1.position.x = 0;
+    mesh1.position.y = 150;
+    mesh1.position.z = 0;
+    mesh1.castShadow = true;
+    mesh1.rotation.y = -Math.PI/2;
+    scene.add(mesh1);
  
     // 立体（下）
     geometry = new THREE.BoxGeometry(100, 100, 100);
@@ -119,13 +120,21 @@ a {
       //map: texture
     });
 
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.x = 0;
-    mesh.position.y = 50;
-    mesh.position.z = 0;
-    mesh.receiveShadow = true;
-    mesh.castShadow = true;
-    scene.add(mesh);
+    let theta = 0;
+    for (let i=0;i<36;i++){
+      mesh = new THREE.Mesh(geometry, material);
+      let x = 500 * Math.cos(theta);
+      mesh.position.x = x;
+      let y = 50;
+      mesh.position.y = y;
+      let z = 500 * Math.sin(theta);
+      mesh.position.z = z;
+      mesh.rotation.y = -theta;
+      mesh.receiveShadow = true;
+      mesh.castShadow = true;
+      theta += Math.PI / 180 * 10;
+      scene.add(mesh);
+    }
  
     //地面（PlaneGeometry）の生成
     var mesh =  new THREE.Mesh(
@@ -171,10 +180,13 @@ a {
   }
  
   // アニメーションの実行（無限ループ）
+  let x = -500;
   function animate() {
       requestAnimationFrame(animate);
+      mesh1.position.x = x;
       controls.update();      
       render();
+      x++;
   }
  
   function render() {
