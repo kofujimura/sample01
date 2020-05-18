@@ -90,11 +90,11 @@ a {
     // (5)表示する物体の作成
  
     // 球体（上）    
-    texture = new THREE.TextureLoader().load('images/like.png');
-
+    //texture = new THREE.TextureLoader().load('images/like.png');
+    
     geometry = new THREE.SphereGeometry(50, 32, 32);
     material = new THREE.MeshPhongMaterial({
-      map: texture
+      map: new THREE.TextureLoader().load('images/like.png')
     });
  
     mesh1 = new THREE.Mesh(geometry, material);
