@@ -53,6 +53,7 @@ a {
   let camera, controls, light, scene, renderer;
   let texture, geometry, material;
   let mesh, mesh1;
+  let snow = new Array();
 
   init();
   animate();
@@ -106,22 +107,22 @@ a {
     scene.add(mesh1);
  
     // 立体（下）
-    geometry = new THREE.BoxGeometry(100, 100, 100);
+    geometry = new THREE.BoxGeometry(5, 5, 5);
     material = new THREE.MeshLambertMaterial({
-      color: 0xdd11ee,
+      color: 0xffffff,
       //specular: 0xcccccc,
       //emissive: 0xff00ff,
       //map: texture
     });
 
-    for (let i=0;i<5;i++){
-      mesh = new THREE.Mesh(geometry, material);
-      mesh.position.x = i*105;
-      mesh.position.y = 50;
-      mesh.position.z = 0;
-      mesh.receiveShadow = true;
-      mesh.castShadow = true;
-      scene.add(mesh);
+    for (let i=0;i<1000;i++){
+      snow[i] = new THREE.Mesh(geometry, material);
+      snow[i].position.x = Math.random()*1000 - 500;
+      snow[i].position.y = Math.random()*1000 - 500;
+      snow[i].position.z = Math.random()*1000 - 500;
+      snow[i].receiveShadow = true;
+      snow[i].castShadow = true;
+      scene.add(snow[i]);
     }
  
     //地面（PlaneGeometry）の生成
@@ -170,7 +171,11 @@ a {
   // アニメーションの実行（無限ループ）
   function animate() {
       requestAnimationFrame(animate);
-      controls.update();      
+      controls.update();
+      for (let i=0;i<1000;i++){
+        snow[i].position.y -= 1;
+        if (snow[i].position.y < -500) snow[i].position.y = 500;
+      }  
       render();
   }
  

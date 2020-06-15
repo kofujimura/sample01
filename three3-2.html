@@ -38,24 +38,30 @@ a {
 </div>
  
 <!-- 以下のライブラリの配置はそのままで構わない -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r83/three.js"></script>
 <script src="TrackballControls.js"></script>
 <script>
  
-// Three.js revision 110 is used.
+// Three.js revision 85 is used.
  
 /* global THREE */
-
+ 
 (function() {
   "use strict";
   
-  let container;
-  let camera, controls, light, scene, renderer;
-  let texture, geometry, material;
-  let mesh, mesh1;
+  var container;
+  var camera, controls, light, scene, renderer;
+  var mesh;
+  var mesh1;
+ 
+  var texture, texture1;
+  var loader = new THREE.TextureLoader();
 
-  init();
-  animate();
+  loader.load('images/like.png', function (x) {
+    texture = x;
+    init();
+    animate();
+  });
 
   function init() {
  
@@ -66,7 +72,7 @@ a {
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
     camera.position.x = 100;
     camera.position.y = 500;
-    camera.position.z = 1000;
+    camera.position.z = 4000;
  
     // カメラをトラックボールで動かす （変更しない）
     controls = new THREE.TrackballControls(camera);
@@ -87,11 +93,11 @@ a {
     light = new THREE.AmbientLight(0xaaaaaa);
     scene.add(light);
  
+ 
     // (5)表示する物体の作成
+    var geometry, material; 
  
     // 球体（上）    
-    texture = new THREE.TextureLoader().load('images/like.png');
-
     geometry = new THREE.SphereGeometry(50, 32, 32);
     material = new THREE.MeshPhongMaterial({
       map: texture
@@ -114,18 +120,25 @@ a {
       //map: texture
     });
 
-    for (let i=0;i<5;i++){
+    let top = 1800;
+    let theta = 0;
+    for (let i=0;i<180;i++){
       mesh = new THREE.Mesh(geometry, material);
-      mesh.position.x = i*105;
-      mesh.position.y = 50;
-      mesh.position.z = 0;
+      let x = 500 * Math.cos(theta);
+      mesh.position.x = x;
+      let y = top - i*10;
+      mesh.position.y = y;
+      let z = 500 * Math.sin(theta);
+      mesh.position.z = z;
+      mesh.rotation.y = -theta;
       mesh.receiveShadow = true;
       mesh.castShadow = true;
+      theta += Math.PI / 180 * 10;
       scene.add(mesh);
     }
  
     //地面（PlaneGeometry）の生成
-    mesh =  new THREE.Mesh(
+    var mesh =  new THREE.Mesh(
                       new THREE.PlaneGeometry(1000, 1000, 1, 1),
                       new THREE.MeshLambertMaterial({
                           side: THREE.DoubleSide,
@@ -136,9 +149,9 @@ a {
     mesh.receiveShadow = true;
     mesh.rotation.x = -Math.PI/2;
     // シーンオブジェクトに追加 
-    scene.add(mesh);              
+    //scene.add(mesh);              
  
-    let axisHelper = new THREE.AxisHelper(1000); 
+    var axisHelper = new THREE.AxisHelper(1000); 
     scene.add(axisHelper);
  
     // scene.fog = new THREE.FogExp2( 0xcccccc, 0.001 );
@@ -168,11 +181,25 @@ a {
   }
  
   // アニメーションの実行（無限ループ）
+  let theta = 0;
+  let top = 1800 + 100;
   function animate() {
-      requestAnimationFrame(animate);
-      controls.update();      
-      render();
-  }
+    requestAnimationFrame(animate); // 再帰呼出し
+    controls.update();
+
+    mesh1.position.x = 500 * Math.cos(theta * Math.PI/180);
+    mesh1.position.z = 500 * Math.sin(theta * Math.PI/180);
+
+    mesh1.rotation.y = -theta* Math.PI/180;
+    mesh1.position.y = top - theta;
+    theta++;
+    if (theta > 1790) {
+      theta =0;
+    } 
+
+  render();
+}
+
  
   function render() {
       renderer.render(scene, camera);

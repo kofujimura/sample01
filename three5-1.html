@@ -28,6 +28,8 @@ a {
   color: red;
 }
 </style>
+<script src="microbit-accelerometer.js"></script> // micro:bit
+
 </head>
  
 <body>
@@ -35,7 +37,9 @@ a {
 <div id="info">
   <a href="http://threejs.org" target="_blank">three.js</a>へようこそ</br>
   左ボタンのドラッグ：回転、右ボタンのドラッグ：平行移動、ホイール：ズーム、
+  <button id="connect">Connect to micro:bit</button> // micro:bit
 </div>
+
  
 <!-- 以下のライブラリの配置はそのままで構わない -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
@@ -48,11 +52,14 @@ a {
 
 (function() {
   "use strict";
-  
   let container;
   let camera, controls, light, scene, renderer;
   let texture, geometry, material;
   let mesh, mesh1;
+  let snow = new Array();
+
+  let button = document.querySelector("#connect");
+  button.addEventListener("click", microbit.connect);
 
   init();
   animate();
@@ -90,11 +97,11 @@ a {
     // (5)表示する物体の作成
  
     // 球体（上）    
-    texture = new THREE.TextureLoader().load('images/like.png');
-
+    //texture = new THREE.TextureLoader().load('images/like.png');
+    
     geometry = new THREE.SphereGeometry(50, 32, 32);
     material = new THREE.MeshPhongMaterial({
-      map: texture
+      map: new THREE.TextureLoader().load('images/like.png')
     });
  
     mesh1 = new THREE.Mesh(geometry, material);
@@ -104,25 +111,6 @@ a {
     mesh1.castShadow = true;
     mesh1.rotation.y = -Math.PI/2;
     scene.add(mesh1);
- 
-    // 立体（下）
-    geometry = new THREE.BoxGeometry(100, 100, 100);
-    material = new THREE.MeshLambertMaterial({
-      color: 0xdd11ee,
-      //specular: 0xcccccc,
-      //emissive: 0xff00ff,
-      //map: texture
-    });
-
-    for (let i=0;i<5;i++){
-      mesh = new THREE.Mesh(geometry, material);
-      mesh.position.x = i*105;
-      mesh.position.y = 50;
-      mesh.position.z = 0;
-      mesh.receiveShadow = true;
-      mesh.castShadow = true;
-      scene.add(mesh);
-    }
  
     //地面（PlaneGeometry）の生成
     mesh =  new THREE.Mesh(
@@ -170,7 +158,17 @@ a {
   // アニメーションの実行（無限ループ）
   function animate() {
       requestAnimationFrame(animate);
-      controls.update();      
+      controls.update();
+      /* micro:bit Start */
+      let acX = microbit.accelerometer.x;
+      let acY = microbit.accelerometer.y;
+      let acZ = microbit.accelerometer.z;
+      let rotX = Math.atan2(Math.sqrt(acY * acY + acZ * acZ), acX);
+      let rotY = Math.atan2(Math.sqrt(acZ * acZ + acX * acX), acY);
+      mesh1.rotation.y = rotX+Math.PI;
+      mesh1.rotation.x = rotY+Math.PI*3/2;
+      /* micro:bit End */
+
       render();
   }
  
