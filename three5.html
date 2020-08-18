@@ -90,12 +90,11 @@ a {
  
     // (5)表示する物体の作成
  
-    // 球体（上）    
-    //texture = new THREE.TextureLoader().load('images/like.png');
-    
+    // 球体（上）
+    texture = new THREE.TextureLoader().load('images/like.png');    
     geometry = new THREE.SphereGeometry(50, 32, 32);
     material = new THREE.MeshPhongMaterial({
-      map: new THREE.TextureLoader().load('images/like.png')
+      map: texture
     });
  
     mesh1 = new THREE.Mesh(geometry, material);
@@ -105,23 +104,26 @@ a {
     mesh1.castShadow = true;
     mesh1.rotation.y = -Math.PI/2;
     scene.add(mesh1);
- 
+
     //地面（PlaneGeometry）の生成
     mesh =  new THREE.Mesh(
-                      new THREE.PlaneGeometry(1000, 1000, 1, 1),
-                      new THREE.MeshLambertMaterial({
-                          side: THREE.DoubleSide,
-                          color: 0x555555
-                      })
-                  );                      
+      new THREE.PlaneGeometry(1000, 1000, 1, 1),
+      new THREE.MeshLambertMaterial({
+        side: THREE.DoubleSide,
+        color: 0x555555
+      })
+    );
+
+    generateLabel("こんにちは世界",0,150,50);
+
     // 影の有効化          
     mesh.receiveShadow = true;
     mesh.rotation.x = -Math.PI/2;
     // シーンオブジェクトに追加 
     scene.add(mesh);              
  
-    let axisHelper = new THREE.AxisHelper(1000); 
-    scene.add(axisHelper);
+    let axesHelper = new THREE.AxesHelper(1000); 
+    scene.add(axesHelper);
  
     // scene.fog = new THREE.FogExp2( 0xcccccc, 0.001 );
  
@@ -138,6 +140,38 @@ a {
     container.appendChild( renderer.domElement );
  
     window.addEventListener( 'resize', onWindowResize, false );
+  }
+
+  function generateLabel(text,x,y,z) {
+    let canvas = document.createElement('canvas');
+    let textLength = String(text).length;
+    if (textLength > 29) {
+      text = "..." + text.substring(textLength - 29);
+      textLength = 32;
+    }
+    canvas.width = textLength * 16;
+    canvas.height = 32;
+    let ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'rgba(0,156,156,0.5)'; // Box color
+    ctx.fillRect(0, 0, canvas.width, 32);
+    ctx.font = "28px sans-serif";
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgb(255,255,255)';  // Text color
+    ctx.fillText(text, canvas.width / 2, 30, canvas.width);
+    let texture = new THREE.Texture(canvas);
+    texture.needsUpdate = true;
+    let material = new THREE.MeshPhongMaterial({
+      transparent: true,
+      map: texture
+    });
+
+    let geometry = new THREE.PlaneGeometry(canvas.width,canvas.height);
+    let label = new THREE.Mesh(geometry,material);
+    label.position.x = x;
+    label.position.y = y;
+    label.position.z = z;
+
+    scene.add(label);
   }
  
   // ウインドウサイズを変えたときのアクション（変更しない）
